@@ -28,14 +28,17 @@ if user_input := st.chat_input("Message your habit coach..."):
         "message": user_input
     }
 
-    backend_response = requests.post(API_BASE_URL, json=format_api_call)
-
-    reply_data = backend_response.json()
-    coach_reply = reply_data["response"]
-
     with st.chat_message("assistant"):
-        st.markdown(coach_reply)
+        message_placeholder = st.empty()
+        try:
+            backend_response = requests.post(API_BASE_URL, json=format_api_call, timeout = 30)
+            backend_response.raise_for_status()
+            coach_reply = backend_response.json()["response"]
+        except requests.exceptions.RequestException as e:
+            coach_reply = f"Couldn't reach the coach right now. Is the backend running? (Error: {e})"
 
+        message_placeholder.markdown(coach_reply)
+    
     st.session_state.messages.append({"role": "assistant", "content": coach_reply})
 
     

@@ -2,8 +2,15 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 from agent import chatbot, clean_bot_output
+from contextlib import asynccontextmanager
+from models import init_db
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    init_db()
+    yield
+
+app = FastAPI(lifespan = lifespan)
 
 class ChatRequest(BaseModel):
     thread_id:str

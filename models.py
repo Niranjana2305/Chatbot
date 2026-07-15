@@ -5,7 +5,11 @@ from sqlmodel import Field, SQLModel, create_engine, Session
 
 
 DATABASE_URL = "sqlite:///habits.db"
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(
+    DATABASE_URL,
+    echo=False,
+    connect_args={"check_same_thread": False}
+    )
 
 class HabitTrackerModel(SQLModel, table = True):
     id:Optional[int] = Field(default=None, primary_key=True)
@@ -15,10 +19,9 @@ class HabitTrackerModel(SQLModel, table = True):
     streak: int = Field(default=0)
     last_checked_in: Optional[date] = None
     frequency_days: int = Field(default=1)
+
 def init_db():
     SQLModel.metadata.create_all(engine)
-
-init_db()
 
 def verify_and_update_streak(habit: HabitTrackerModel, session: Session) ->None:
     if habit.last_checked_in is None:

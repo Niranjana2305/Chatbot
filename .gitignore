@@ -5,6 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
 
 # Virtual environments
 .venv

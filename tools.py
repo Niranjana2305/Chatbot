@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from models import HabitTrackerModel, engine, verify_and_update_streak
 from langchain_core.tools import tool
 from datetime import date
@@ -11,7 +11,7 @@ def add_habit(name:str, frequency_days:int = 1, description: Optional[str]= None
     Always clarify or pass the frequency_days integer (e.g., 1 for daily, 2 for every two days, 7 for weekly, 30 for monthly).
     """
     with Session(engine) as session:
-        statement = select(HabitTrackerModel).where(HabitTrackerModel.name == name)
+        statement = select(HabitTrackerModel).where(func.lower(HabitTrackerModel.name) == name.strip().lower())
         existing = session.exec(statement).first()
         if existing:
             return f"Habit '{name}' already exists in your tracker."
@@ -42,7 +42,7 @@ def list_habits() ->str:
 def log_checkin(name:str)->str:
     """Log a successful check-in for a specific habit by name."""
     with Session(engine) as session:
-        statement = select(HabitTrackerModel).where(HabitTrackerModel.name == name)
+        statement = select(HabitTrackerModel).where(func.lower(HabitTrackerModel.name) == name.strip().lower())
         habit = session.exec(statement).first()
 
         if not habit:
