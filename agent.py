@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
-from langgraph.checkpoint.memory import InMemorySaver
 from tools import HABIT_TOOLS
 from langgraph.checkpoint.sqlite import SqliteSaver
 import sqlite3
