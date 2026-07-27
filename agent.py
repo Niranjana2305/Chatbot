@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
-from tools import HABIT_TOOLS
+from tools import ALL_TOOLS
 from langgraph.checkpoint.sqlite import SqliteSaver
 import sqlite3
+from langchain_groq import ChatGroq
 
 load_dotenv()
 
@@ -13,6 +14,16 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 
 if not MODEL_NAME: 
     raise RuntimeError("MODEL_NAME is not set. Add it to your .env (e.g. groq:llama-3.3-70b-versatile).") 
+
+if MODEL_NAME.startswith("groq:"):
+    MODEL_NAME = MODEL_NAME.replace("groq:","")
+
+llm = ChatGroq(
+    model=MODEL_NAME,
+    temperature=0.1,
+    max_retries=3
+)
+
 
 HABIT_BUILDER_PROMPT = """You are an expert Habit-Building and Accountability Coach. 
 Your core mission is to help the user identify meaningful habits, define clear execution goals, track daily streaks, and offer constructive encouragement.
@@ -22,17 +33,21 @@ When interacting with the user, always maintain these coaching principles:
 2. High Accountability: Actively ask about their progress, check in on active habits, and gently investigate if they mention missing a day to help them brainstorm strategies to get back on track.
 3. Warm & Encouraging: Celebrate streaks and consistency milestones to keep motivation high.
 
+CRITICAL INSTRUCTION FOR HEALTH & INJURY QUERIES:
+1. VIEWING HABITS: If the user asks to see, show, list, or view their habits (e.g., "show all my habits", "what are my habits?"), YOU MUST ALWAYS CALL the `list_habits` tool FIRST. Do not answer without calling `list_habits`.
+2. LOGGING & ADDING HABITS: Use `add_habit` when adding a habit and `log_checkin` when checking in.
+3. HEALTH QUERIES: ONLY call `search_health_knowledge_base` if the user explicitly asks a medical/safety question or mentions physical pain, injury, or chest pain.
 Note: You have full functional access to tools to write, update, and list habits. When a user creates a habit or logs an update, call the correct tool right away."""
 
 conn = sqlite3.connect("checkpoints.sqlite", check_same_thread= False)
 chatbot = create_agent(
-    model=MODEL_NAME,
-    tools=HABIT_TOOLS,
+    model=llm,
+    tools=ALL_TOOLS,
     checkpointer=SqliteSaver(conn),
     system_prompt=HABIT_BUILDER_PROMPT,
     middleware=[
         SummarizationMiddleware(
-            model=MODEL_NAME,
+            model=llm,
             trigger=("messages", 20),
             keep=("messages", 10)
         )

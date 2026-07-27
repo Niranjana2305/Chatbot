@@ -1,0 +1,20 @@
+# Mental Health, Burnout, and Habit Psychology
+
+## 1. Burnout and Toxic Habit Perfectionism
+### Symptoms of Habit Burnout
+- Feeling overwhelmed by streak counters, obsessive anxiety over missing a day, guilt surrounding uncompleted habits, emotional numbness, and loss of enjoyment in self-improvement.
+### Causes
+- Setting unrealistic initial expectations ("all-or-nothing" mentality), relying strictly on willpower without adequate rest, or equating personal self-worth to habit streak counts.
+### Management Strategies
+- **The 2-Minute Rule**: Scale the habit down to its smallest non-intimidating version (e.g., instead of "Read 30 minutes", change habit to "Read 1 page").
+- **Never Miss Twice Rule**: Accept that life disruptions happen. Frame missing a single day as normal recovery, not a total failure.
+
+---
+
+## 2. Differentiating Stress from Clinical Mental Health Concerns
+### General Stress / Habit Resistance
+- Temporary reluctance to perform daily routine, mild procrastination, or temporary tiredness. Resolves after starting the habit or taking a planned rest day.
+
+### Clinical Anxiety or Depression Red Flags
+- Persistent feeling of hopelessness or worthlessness lasting longer than 2 weeks, inability to perform daily self-care tasks, panic attacks, or thoughts of self-harm.
+- **Action**: The habit bot must acknowledge its limitations, validate the user's emotional state, and encourage contacting a qualified mental health professional or crisis helpline (e.g., dialing 988 in the US/Canada).

@@ -1,0 +1,26 @@
+# Exercise Safety, DOMS vs. Injury, and Safe Progression
+
+## 1. Delayed Onset Muscle Soreness (DOMS) vs. Acute Injury
+### Delayed Onset Muscle Soreness (DOMS)
+- **Symptoms**: Dull, aching muscle tightness, tender to touch, mild stiffness during movement, symmetrical soreness (e.g., both thighs feel equally sore).
+- **Causes**: Microscopic tears in muscle fibers resulting from new exercise stimulus, eccentric contractions (e.g., running downhill, lowering weights), or sudden volume increases.
+- **Timeline**: Begins 12–24 hours post-workout, peaks at 24–48 hours, and gradually subsides over 3–5 days.
+- **Management**: Light active recovery (walking, gentle cycling), hydration, adequate protein intake, and sufficient sleep. Exercise can be continued at reduced intensity.
+
+### Acute Exercise Injury
+- **Symptoms**: Sharp, burning, or stabbing pain; localized to a specific point, joint, bone, or tendon; swelling, bruising, or localized heat; asymmetric pain.
+- **Causes**: Poor movement mechanics, inadequate warm-up, excessive load, or acute trauma/overextension.
+- **Timeline**: Occurs instantly during a specific movement or progressively worsens turn-by-turn during a workout.
+- **Management**: Follow PRICE protocol (Protect, Rest, Ice, Compress, Elevate). Pause the habit until evaluated by a healthcare professional.
+
+---
+
+## 2. Safe Progression Protocols
+### The 10% Rule for Volume and Load
+- **Definition**: Never increase weekly training volume (distance, time, sets, or total weight lifted) by more than 10% from the previous week.
+- **Causes of Progression Injuries**: Increasing distance or load too quickly leads to stress fractures, shin splints, tendinopathy, and plantar fasciitis.
+- **Prevention**: Keep a habit log. If running 10 miles this week, limit next week's goal to 11 miles maximum.
+
+### Warm-ups and Cool-downs
+- **Dynamic Warm-Up**: 5–10 minutes of active range-of-motion movements (arm circles, leg swings, bodyweight lunges, walking high-knees) to raise core body temperature and prime neuromuscular pathways.
+- **Cool-Down**: 5 minutes of decreasing activity followed by static stretching to lower heart rate safely and restore baseline muscle length.
