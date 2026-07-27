@@ -1,24 +1,35 @@
+Here is the updated, clean `README.md` reflecting your current architecture—including the **Knowledge Base (RAG)** pipeline, the fix for model naming without prefixes, and vector store generation instructions.
+
+---
+
+```markdown
 # Habit Builder Bot 🚀
 
-Welcome to the **Habit Builder Bot**—your personal, AI-powered habit and accountability coach. This application consists of a robust **FastAPI backend** running a LangGraph agent powered by Gemini or Groq, paired with an interactive **Streamlit frontend** UI.
+Welcome to the **Habit Builder Bot**—your personal, AI-powered habit and accountability coach. This application features a robust **FastAPI** backend running a LangChain/LangGraph agent with RAG knowledge base retrieval, paired with an interactive **Streamlit** frontend UI.
 
 ---
 
 ## 🛠️ Prerequisites
 
-Before getting started, make sure you have [uv](https://github.com/astral-sh/uv) installed on your system. `uv` is used for ultra-fast dependency management and virtual environment handling.
+Before getting started, make sure you have **`uv`** installed on your system for fast dependency management and virtual environment handling.
+
+If you haven't installed `uv`, install it via PowerShell/Terminal:
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm [https://astral.sh/uv/install.ps1](https://astral.sh/uv/install.ps1) | iex"
+
+```
 
 ---
 
 ## ⚙️ Setup Instructions
 
-Follow these steps to get the application set up locally:
+Follow these steps to set up and run the application locally:
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd habit-builder-bot
+git clone [https://github.com/Niranjana2305/Chatbot.git](https://github.com/Niranjana2305/Chatbot.git)
+cd Chatbot
 
 ```
 
@@ -33,7 +44,7 @@ uv sync
 
 ### 3. Configure Environment Variables
 
-Create a `.env` file in the root directory of the project. You can copy the template from `.env.example`:
+Create a `.env` file in the root directory:
 
 ```bash
 cp .env.example .env
@@ -42,21 +53,31 @@ cp .env.example .env
 
 Open `.env` and fill in your model configuration and API keys:
 
-```text
-# Use the provider prefix (e.g., groq:model_name or google_genai:model_name)
-MODEL_NAME=groq:llama-3.3-70b-versatile
+```env
+# Model Name (e.g., llama-3.3-70b-versatile)
+MODEL_NAME=llama-3.3-70b-versatile
 
-# Add your relevant API keys
+# Add your API keys
 GROQ_API_KEY=your_groq_api_key_here
-GOOGLE_API_KEY=your_gemini_api_key_here
 
 ```
+
+### 4. Build the Health Knowledge Base (RAG Vectorstore)
+
+Before starting the chatbot, generate the FAISS vector database from your markdown/text documents:
+
+```bash
+uv run python build_kb.py
+
+```
+
+*(This generates the local `faiss_index/` directory used by the coach to answer health and safety queries.)*
 
 ---
 
 ## 🚀 Running the Application
 
-To run the application, you must start the backend server **first**, followed by the frontend interface.
+To run the application, start the backend server first, followed by the frontend interface.
 
 ### Step 1: Start the FastAPI Backend (First)
 
@@ -67,27 +88,32 @@ uv run uvicorn main:app --reload
 
 ```
 
-*The backend will be available at `[http://127.0.0.1:8000](http://127.0.0.1:8000)`.*
+The backend will be live at `http://127.0.0.1:8000`.
 
 ### Step 2: Start the Streamlit Frontend (Second)
 
-Once the backend is up and running, open a **second terminal** and launch the Streamlit chat interface:
+Open a second terminal and launch the Streamlit chat interface:
 
 ```bash
 uv run streamlit run app.py
 
 ```
 
-*This will automatically open the UI in your web browser at `http://localhost:8501`.*
+This will automatically open the UI in your browser at `http://localhost:8501`.
 
 ---
 
 ## 📂 Project Structure
 
-* `main.py` — The FastAPI backend router and startup lifecycle.
-* `app.py` — The Streamlit chat interface and message state manager.
-* `agent.py` — The LangGraph accountability coach agent, memory saver, and LLM configuration.
-* `models.py` — SQLModel database schemas for habit tracking.
-* `tools.py` — Custom LLM tools for creating, updating, and listing user habits.
-* `habits.db` — SQLite database storing your active habits and track logs.
-* `checkpoints.sqlite` — SQLite database preserving the LLM's chat history across restarts.
+* **`main.py`** — The FastAPI backend router, message filtering logic, and startup lifecycle.
+* **`app.py`** — The Streamlit chat interface, RAG expander display, and message state manager.
+* **`agent.py`** — The LangChain accountability coach agent, system prompt, and LLM configuration.
+* **`tools.py`** — Custom LLM tools for habit management (`add_habit`, `list_habits`, `log_checkin`) and health knowledge base searches (`search_health_knowledge_base`).
+* **`models.py`** — SQLModel database schemas and streak calculation utilities.
+* **`build_kb.py`** — Embeddings generator script that builds the local FAISS vector store.
+* **`knowledge_base/`** — Plaintext & markdown document store for health, safety, and exercise recovery guidelines.
+* **`habits.db`** — SQLite database storing active user habits and streak logs.
+
+```
+
+```
