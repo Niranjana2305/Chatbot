@@ -2,7 +2,7 @@ import uuid
 import streamlit as st
 import requests
 
-st.set_page_config(page_title = "Habit Builder Bot", layout = "centered")
+st.set_page_config(page_title="Habit Builder Bot", layout="centered")
 st.title("Habit Builder Coach")
 st.caption("Build and track meaningful habits for life. Your AI accountability partner.")
 
@@ -17,17 +17,17 @@ if "messages" not in st.session_state:
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
-        if msg.get("answer_type") == "rag":
-            st.caption("Answered using Knowledge Base")
-            if msg.get("retrieved_content"):
-                with st.expander("Sources Used"):
-                    for idx, snippet in enumerate(msg["retrieved_content"],1):
-                        st.markdown(f"**Source {idx}**")
-                        st.markdown(snippet)
-                        st.markdown("---")
-                        
-        elif msg.get("answer_type") == "direct":
-            st.caption("Answered by AI")
+        if msg["role"] == "assistant":
+            answer_type = msg.get("answer_type", "direct")
+            if answer_type == "rag":
+                st.caption("**Source:** Verified Health KB")
+                retrieved_context = msg.get("retrieved_context", [])
+                if retrieved_context:
+                    with st.expander("Retrieved Health Knowledge Base Passages"):
+                        for ctx in retrieved_context:
+                            st.markdown(ctx)
+            else:
+                st.caption("**Source:** Direct Answer")
 
 if user_input := st.chat_input("Message your habit coach..."):
     with st.chat_message("user"):
@@ -40,39 +40,35 @@ if user_input := st.chat_input("Message your habit coach..."):
     }
 
     with st.chat_message("assistant"):
-        message_placeholder = st.empty()
         answer_type = "direct"
-        retrieved_content = []
-        try:
-            backend_response = requests.post(API_BASE_URL, json=format_api_call, timeout = 30)
-            backend_response.raise_for_status()
-            data = backend_response.json()
-            coach_reply = data.get("response", "")
-            answer_type = data.get("answer_type", "direct")
-            retrieved_content = data.get("retrieved_content", [])
-       
-        except requests.exceptions.RequestException as e:
-            coach_reply = f"Couldn't reach the coach right now. (Error: {e})"
+        retrieved_context = []
 
-        message_placeholder.markdown(coach_reply)
-        if answer_type == "rag":
-            st.caption("Answered using Knowledge Base")
-            if retrieved_content:
-                with st.expander("Sources Used"):
-                    for idx, snippet in enumerate(retrieved_content,1):
-                        st.markdown(f"**Source {idx}**")
-                        st.markdown(snippet)
-                        st.markdown("---")
-        else:
-            st.caption("Answered by AI")
+        try:
+            backend_response = requests.post(API_BASE_URL, json=format_api_call, timeout=30)
+            backend_response.raise_for_status()
             
+            payload = backend_response.json()
+            coach_reply = payload.get("response", "")
+            answer_type = payload.get("answer_type", "direct")
+            retrieved_context = payload.get("retrieved_context", [])
+            
+        except requests.exceptions.RequestException as e:
+            coach_reply = f"Couldn't reach the coach right now. Is the backend running? (Error: {e})"
+
+        st.markdown(coach_reply)
+
+        if answer_type == "rag":
+            st.caption("**Source:** Verified Health KB")
+            if retrieved_context:
+                with st.expander("Retrieved Health Knowledge Base Passages"):
+                    for ctx in retrieved_context:
+                        st.markdown(ctx)
+        else:
+            st.caption("**Source:** Direct Answer")
+    
     st.session_state.messages.append({
-        "role": "assistant",
+        "role": "assistant", 
         "content": coach_reply,
         "answer_type": answer_type,
-        "retrieved_content": retrieved_content
-     })
-
-    
-
-    
+        "retrieved_context": retrieved_context
+    })
