@@ -1,0 +1,35 @@
+# Emergency Red Flags, Symptoms, Causes, and Immediate Triage
+
+## 1. Cardiovascular & Respiratory Red Flags
+### Chest Pain, Pressure, or Tightness
+- **Symptoms**: Squeezing, pressure, fullness, or pain in the center or left side of the chest; radiating pain to the jaw, neck, back, one or both arms (especially the left arm); cold sweats, shortness of breath, or nausea.
+- **Possible Causes**: Acute myocardial infarction (heart attack), angina, pericarditis, aortic dissection, or pulmonary embolism.
+- **Immediate Action**: STOP all physical activity immediately. Sit down in a comfortable position. Call emergency medical services (911) right away. Do not attempt to drive to the hospital.
+
+### Severe Shortness of Breath (Dyspnea)
+- **Symptoms**: Inability to speak in full sentences, gasping for air, wheezing, blue or pale lips/fingernails (cyanosis), or feeling like you are suffocating.
+- **Possible Causes**: Exercise-induced bronchospasm/asthma attack, acute heart failure, pulmonary embolism, or pneumothorax.
+- **Immediate Action**: Stop exertion, sit upright, use a prescribed rescue inhaler if diagnosed with asthma, and call 911 if breathing does not normalize within 2–3 minutes.
+
+### Dizziness, Syncope (Fainting), and Lightheadedness
+- **Symptoms**: Sudden lightheadedness, loss of vision/tunnel vision, loss of balance, or complete loss of consciousness.
+- **Possible Causes**: Cardiac arrhythmia, sudden drop in blood pressure (orthostatic hypotension), severe dehydration, hypoglycemia, or valve disease (e.g., aortic stenosis).
+- **Immediate Action**: Lie down immediately and elevate legs slightly above heart level to restore blood flow to the brain. Seek urgent or emergency medical evaluation.
+
+---
+
+## 2. Acute Musculoskeletal & Neurological Emergencies
+### Severe Acute Structural Injury
+- **Symptoms**: A loud "pop" or "snap" sound/sensation, immediate inability to bear weight, visible joint deformity, rapid severe swelling, or intense, sharp pain.
+- **Possible Causes**: Full ligament tears (e.g., ACL tear), complete muscle/tendon ruptures (e.g., Achilles tendon rupture), or bone fractures.
+- **Immediate Action**: Immobilize the limb, apply ice, do not attempt to bear weight or stretch the area, and seek immediate urgent care or emergency room treatment.
+
+### Neurological Red Flags
+- **Symptoms**: Sudden weakness or numbness on one side of the face or body, slurred speech, sudden loss of vision, sudden extreme headache ("thunderclap"), or confusion.
+- **Possible Causes**: Stroke, transient ischemic attack (TIA), or intracranial hemorrhage.
+- **Immediate Action**: Call 911 immediately (FAST protocol: Face drooping, Arm weakness, Speech difficulty, Time to call 911).
+
+---
+
+## 3. Standard Medical Disclaimer
+This habit-coaching bot is an AI assistant, not a medical professional or licensed healthcare provider. The information provided is for educational and coaching purposes only and should never replace professional medical advice, diagnosis, or treatment. Always consult a qualified medical professional before starting, modifying, or intensifying any exercise or health habit.
