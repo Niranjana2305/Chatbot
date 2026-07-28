@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from langchain_core.messages import HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage, ToolMessage, AIMessage
 from agent import chatbot, clean_bot_output
 from contextlib import asynccontextmanager
 from models import init_db
@@ -18,8 +18,8 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
-    answer_type: str = "direct"
-    retrieved_content: list[str] = []
+    answer_type: str 
+    retrieved_context: list[str] = []
 
 @app.get('/health')
 def health_check():
@@ -32,39 +32,45 @@ def chat_message(request: ChatRequest):
 
     config = {"configurable": {"thread_id": request.thread_id}}
     user_input = {"messages": [HumanMessage(content=request.message)]}
+    
+    try:
+        current_state = chatbot.get_state(config)
+        history_len_before = len(current_state.values.get("messages", []))
+    except Exception:
+        history_len_before = 0
+
     result = chatbot.invoke(user_input, config)
 
     all_messages = result.get('messages', [])
     if not all_messages:
         raise HTTPException(status_code=500, detail="No response from chatbot")
-        
-    raw_text = all_messages[-1].content
+
+    new_messages = all_messages[history_len_before:]
+    
+    answer_type = "direct"
+    retrieved_context = []
+
+    for msg in new_messages:
+        if isinstance(msg, ToolMessage) and getattr(msg, "name", None) == "search_health_knowledge_base":
+            answer_type = "rag"
+            retrieved_context.append(str(msg.content))
+
+    ai_messages = [m for m in all_messages if isinstance(m, AIMessage)]
+    if not ai_messages:
+        raise HTTPException(status_code=500, detail="Chatbot failed to generate an AI response.")
+
+    raw_text = ai_messages[-1].content
+    
+    if isinstance(raw_text, list):
+        raw_text = "".join([str(block) for block in raw_text])
+
     cleaned = clean_bot_output(raw_text)
 
-    answer_type = "direct"
-    retrieved_content = []
-
-    # 1. Find the index of the MOST RECENT HumanMessage (the current turn)
-    last_human_idx = -1
-    for idx in range(len(all_messages) - 1, -1, -1):
-        if isinstance(all_messages[idx], HumanMessage):
-            last_human_idx = idx
-            break
-
-    # 2. Inspect ONLY messages generated in this current turn (after the last HumanMessage)
-    if last_human_idx != -1:
-        current_turn_messages = all_messages[last_human_idx:]
-        for msg in current_turn_messages:
-            if isinstance(msg, ToolMessage):
-                tool_name = getattr(msg, "name", "") or ""
-                if "search_health" in tool_name or "knowledge_base" in tool_name:
-                    content = str(msg.content).strip()
-                    if content and not content.startswith("No specific health") and not content.startswith("Health knowledge base is currently unavailable"):
-                        answer_type = "rag"
-                        retrieved_content.append(content)
+    if not cleaned or not cleaned.strip():
+        cleaned = raw_text.strip() or "No output generated."
 
     return ChatResponse(
-        response=cleaned, 
-        answer_type=answer_type, 
-        retrieved_content=retrieved_content
+        response=cleaned,
+        answer_type=answer_type,
+        retrieved_context=retrieved_context
     )
