@@ -1,68 +1,149 @@
-Habit Builder Bot 🚀
 
-Welcome to the Habit Builder Bot—your personal, AI-powered habit and accountability coach. This application consists of a robust FastAPI backend running a LangGraph agent powered by Gemini or Groq, paired with an interactive Streamlit frontend UI.
+# 🏃 Habit Builder Coach
 
-🛠️ Prerequisites
+An intelligent, full-stack AI habit coaching application that helps users track daily habits, maintain streaks, and receive verified exercise safety guidance using Retrieval-Augmented Generation (RAG).
 
-Before getting started, make sure you have uv installed on your system. uv is used for ultra-fast dependency management and virtual environment handling.
+---
 
-⚙️ Setup Instructions
+## 📌 Project Summary
 
-Follow these steps to get the application set up locally:
+The **Habit Builder Bot** combines interactive habit tracking with safety-focused conversational AI. Built with **LangChain**, **FastAPI**, **SQLModel**, and **Streamlit**, it acts as a personal accountability coach while ensuring users stay safe during physical activities.
 
-1. Clone the Repository
+When users ask standard habit management questions (like adding habits, listing active goals, or checking streaks), the AI interacts directly with a database via structured tool calls. When users express concerns about physical symptoms, overtraining, chest pain, or exercise safety, the system automatically routes the query to a local **FAISS vector database** containing verified health guidelines to provide grounded, safety-first answers with mandatory medical disclaimers.
 
-git clone https://github.com/Niranjana2305/Chatbot.git
-cd Chatbot
+---
 
-2. Install Dependencies
+## ✨ Key Features
 
-Use uv to automatically create a virtual environment and sync all required packages:
+- 📝 **Interactive Habit Tracking**: Create custom habits with specific target frequencies (daily, weekly, custom interval).
+- 🔥 **Automated Streak Maintenance**: Log check-ins and let the bot update and calculate streaks automatically in real time.
+- 📚 **Grounded Health Guidance (RAG)**: Uses local vector search (`sentence-transformers/all-MiniLM-L6-v2` + FAISS) to answer exercise safety and injury questions using verified knowledge base files.
+- 🏷️ **Source Transparency**: The UI displays an explicit source badge (`Direct Answer` vs. `Verified Health KB`) and offers a collapsible view of the exact retrieved context passages.
+- 🛡️ **Safety & Disclaimers**: Automatic detection of critical health symptoms (e.g., chest pain, severe soreness) with required medical disclaimers.
+- 💾 **Persistent Chat Sessions**: State checkpointing powered by SQLite keeps conversation history active across user sessions.
+
+---
+
+## 📸 Screenshots & Visual Walkthrough
+
+### 1. Adding a New Habit Goal
+*When you ask the assistant to start tracking a new goal, it invokes the `add_habit` tool to register the habit and initialize its streak counter in the database.*
+
+<img width="475" alt="Screenshot 2026-07-28 071336" src="https://github.com/user-attachments/assets/0f1367ed-9d2b-4430-b96b-ae7f0d54949b" />
+
+---
+
+### 2. Logging a Check-in & Updating Streaks
+*When you log progress for a habit, the assistant runs `log_checkin`, verifies the last check-in date, increments your streak counter, and provides encouraging feedback.*
+
+<img width="447" height="136" alt="Screenshot 2026-07-28 073205" src="https://github.com/user-attachments/assets/59a5b224-0034-486f-96a6-f7b3c6ed081a" />
+
+---
+
+### 3. Listing Active Habits & Formatted Streaks
+*Asking to view active habits calls `list_habits` and returns a clean, structured text list with streak numbers and last check-in timestamps.*
+
+
+<img width="514" height="200" alt="Screenshot 2026-07-28 071845" src="https://github.com/user-attachments/assets/f48c49ed-f0f1-479a-8fa8-3914f7fcfbda" />
+
+---
+
+### 4. Verified Health Guidance (RAG Invocations)
+*When asking health or safety questions, the assistant triggers `search_health_knowledge_base`, grounds its advice in retrieved passages, displays a safety disclaimer, and provides an expandable view of source context.*
+
+<img width="543" height="300" alt="Screenshot 2026-07-28 071542" src="https://github.com/user-attachments/assets/b87b88c7-f79c-4b60-ad6e-944f81818982" />
+
+---
+## 🏗️ Tech Stack
+
+| Component | Technology Used |
+| :--- | :--- |
+| **Frontend UI** | Streamlit |
+| **Backend API** | FastAPI + Uvicorn |
+| **Agent Framework** | LangChain / LangGraph |
+| **Embeddings Model** | HuggingFace (`sentence-transformers/all-MiniLM-L6-v2`) |
+| **Vector Store** | FAISS |
+| **Database** | SQLite + SQLModel (ORMs) |
+| **Package Manager** | `uv` |
+
+---
+
+## 🚀 Quick Start Guide
+
+### Prerequisites
+- Python 3.10+
+- [`uv`](https://docs.astral.sh/uv/) installed on your machine
+
+### 1. Clone the Repository & Setup Environment
+```bash
+git clone [https://github.com/your-username/habit-builder-bot.git](https://github.com/your-username/habit-builder-bot.git)
+cd habit-builder-bot
+
+# Install dependencies using uv
 uv sync
 
-3. Configure Environment Variables
+```
 
-Create a .env file in the root directory of the project. You can copy the template from .env.example:
-cp .env.example .env
+### 2. Configure Environment Variables
 
-Open .env and fill in your model configuration and API keys:
-# Model configuration (e.g. llama-3.3-70b-versatile)
-MODEL_NAME=llama-3.3-70b-versatile
+Create a `.env` file in the root directory:
 
-# Add your relevant API keys
-GROQ_API_KEY=your_groq_api_key_here
-GOOGLE_API_KEY=your_gemini_api_key_here
+```env
+MODEL_NAME=groq:llama-3.3-70b-versatile
+# OR for Google Gemini:
+# MODEL_NAME=gemini:gemini-1.5-flash
+# GOOGLE_API_KEY=your_google_api_key_here
 
-4. Build the Knowledge Base Index
+```
 
-Build the FAISS vector database for health and safety queries before launching:
+### 3. Build the Vector Knowledge Base
+
+Build the local FAISS vector index from the Markdown files in `knowledge_base/`:
+
+```bash
 uv run python build_kb.py
 
-🚀 Running the Application
+```
 
-To run the application, you must start the backend server first, followed by the frontend interface.
+### 4. Run the Backend API
 
-Step 1: Start the FastAPI Backend (First)
+Start the FastAPI server:
 
-The backend initializes the SQLite database tables on startup and runs the AI agent. Run this in your first terminal:
+```bash
 uv run uvicorn main:app --reload
 
-The backend will be available at http://127.0.0.1:8000.
+```
 
-Step 2: Start the Streamlit Frontend (Second)
+*Backend runs at:* `http://127.0.0.1:8000`
 
-Once the backend is up and running, open a second terminal and launch the Streamlit chat interface:
+### 5. Launch the Streamlit Frontend
+
+In a new terminal window:
+
+```bash
 uv run streamlit run app.py
 
-This will automatically open the UI in your web browser at http://localhost:8501.
+```
 
-📂 Project Structure
+*Frontend launches at:* `http://localhost:8501`
 
-main.py — The FastAPI backend router and startup lifecycle.
-app.py — The Streamlit chat interface and message state manager.
-agent.py — The LangGraph accountability coach agent, memory saver, and LLM configuration.
-models.py — SQLModel database schemas for habit tracking.
-tools.py — Custom LLM tools for creating, updating, listing user habits, and health RAG retrieval.
-build_kb.py — Script to build the local FAISS vector store from health documents.
-knowledge_base/ — Health, recovery, and exercise safety guide documents.
-habits.db — SQLite database storing your active habits and track logs.
+---
+
+## 📂 Project Structure
+
+```text
+├── knowledge_base/         # Markdown files with exercise safety & health guidelines
+│   ├── 01_emergency_red_flags.md
+│   ├── 02_exercise_safety_progression.md
+│   ├── 03_overtraining_recovery.md
+│   ├── 04_sleep_hydration_nutrition.md
+│   └── 05_mental_health_burnout.md
+├── build_kb.py             # Script to chunk text and generate FAISS vector index
+├── rag.py                  # LangChain tool wrapper for local FAISS similarity search
+├── tools.py                # Database CRUD tools for habit tracking & streaks
+├── models.py               # SQLModel database schemas (HabitTrackerModel)
+├── agent.py                # Core LangChain agent setup, prompt definition, and checkpointing
+├── main.py                 # FastAPI backend handling /chat endpoints & response types
+└── app.py                  # Streamlit user interface
+
+```
