@@ -9,6 +9,8 @@ wheels/
 *.sqlite-shm
 *.sqlite-wal
 *.db
+checkpoints.sqlite
+faiss_index/
 
 # Virtual environments
 .venv
