@@ -6,6 +6,7 @@ from tools import HABIT_TOOLS
 from langgraph.checkpoint.sqlite import SqliteSaver
 import sqlite3
 import re
+from langgraph.store.sqlite import SqliteStore
 
 load_dotenv()
 MODEL_NAME = os.getenv("MODEL_NAME")
@@ -21,6 +22,11 @@ When interacting with the user, always maintain these coaching principles:
 2. High Accountability: Actively ask about their progress, check in on active habits, and gently investigate if they mention missing a day to help them brainstorm strategies to get back on track.
 3. Warm & Encouraging: Celebrate streaks and consistency milestones to keep motivation high.
 
+LONG-TERM MEMORY INSTRUCTIONS:
+- You have access to cross-session memory tools: `save_user_profile` and `get_user_profile`.
+- Whenever a user opens a conversation or asks about their background, use `get_user_profile(user_id=...)` to check their core motivation, preferences, or past struggles.
+- Whenever the user shares significant personal context (e.g., why they want to build habits, preferred coaching style, family goals), immediately store it using `save_user_profile(user_id=..., key=..., value=...)`.
+
 TOOL OUTPUT FORMATTING RULE:
 - When you call the `list_habits` tool, you MUST display the EXACT output string returned by the tool word-for-word in your final response. Do NOT summarize, rephrase, or alter the formatted list.
 
@@ -31,11 +37,17 @@ CRITICAL HEALTH & SAFETY INSTRUCTIONS:
 - For standard habit coaching, streak tracking, and general questions, answer directly using your habit tools as usual.
 Note: You have full functional access to tools to write, update, and list habits. When a user creates a habit or logs an update, call the correct tool right away."""
 
-conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+checkpointer_conn = sqlite3.connect("checkpoints.sqlite", check_same_thread=False)
+
+store_conn = sqlite3.connect("long_term_store.sqlite", check_same_thread=False, isolation_level=None)
+store = SqliteStore(store_conn)
+store.setup()
+
 chatbot = create_agent(
     model=MODEL_NAME,
     tools=HABIT_TOOLS,
-    checkpointer=SqliteSaver(conn),
+    checkpointer=SqliteSaver(checkpointer_conn),
+    store=store,
     system_prompt=HABIT_BUILDER_PROMPT,
     middleware=[
         SummarizationMiddleware(
