@@ -6,6 +6,27 @@ from datetime import date
 from rag import search_health_knowledge_base  
 
 @tool
+def save_user_profile(user_id: str, key: str, value: str) -> str:
+    """Save long-term user facts across chat sessions (e.g., key='motivation', value='wants more energy for kids')."""
+    if not user_id or not key or not value:
+        return "Error: missing user_id, key, or value."
+    from agent import store
+    namespace = ("users", user_id, "profile")
+    store.put(namespace, key, {"data": value})
+    return f"Successfully saved memory '{key}' for user '{user_id}'."
+
+@tool
+def get_user_profile(user_id: str) -> str:
+    """Retrieve all saved long-term profile memories for a given user_id."""
+    from agent import store
+    namespace = ("users", user_id, "profile")
+    items = store.search(namespace)
+    if not items:
+        return f"No long-term memories found for user '{user_id}'."
+    records = [f"- {item.key}: {item.value.get('data')}" for item in items]
+    return f"Long-term profile for user '{user_id}':\n" + "\n".join(records)
+
+@tool
 def add_habit(name:str, frequency_days:int = 1, description: Optional[str]= None) -> str:
     """
     Add a new habit to the database and start tracking its streak.
@@ -28,10 +49,8 @@ def list_habits() ->str:
     with Session(engine) as session:
         statement = select(HabitTrackerModel)
         habits = session.exec(statement).all()
-
         if not habits:
             return "You don't have any habits tracked yet! Let's add one."
-        
         response = "Here are your current habits: \n\n"
         for h in habits:
             verify_and_update_streak(h, session)
@@ -60,7 +79,6 @@ def log_checkin(name:str)->str:
         habit.last_checked_in = today
         session.add(habit)
         session.commit()
-        
         return f"Streak updated! You've now completed '{name}' for {habit.streak} consecutive days. Keep it going!"
 
-HABIT_TOOLS = [add_habit, list_habits, log_checkin, search_health_knowledge_base]
+HABIT_TOOLS = [add_habit, list_habits, log_checkin, search_health_knowledge_base, save_user_profile, get_user_profile]
