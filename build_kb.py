@@ -1,29 +1,32 @@
 import os
-from langchain_community.document_loaders import DirectoryLoader, TextLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
+from pathlib import Path
 from dotenv import load_dotenv
+from langchain_core.documents import Document
+from langchain_text_splitters.character import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import FastEmbedEmbeddings
 
 load_dotenv()
 
 INDEX_SAVE_PATH = "faiss_index"
+KNOWLEDGE_BASE_DIR = Path("knowledge_base")
 
 def build_vector_store():
-    print("loading documents from knowledge base...")
-    loader = DirectoryLoader(
-        path="knowledge_base",
-        glob="**/*.txt",
-        loader_cls=TextLoader,
-        loader_kwargs={"encoding": "utf-8"},
-        show_progress=True,
-    )
-    docs = loader.load()
+    print("Loading documents from knowledge base...")
+    
+    docs = []
+    for file_path in KNOWLEDGE_BASE_DIR.rglob("*.txt"):
+        try:
+            content = file_path.read_text(encoding="utf-8")
+            docs.append(Document(page_content=content, metadata={"source": str(file_path)}))
+        except Exception as e:
+            print(f"Error reading {file_path}: {e}")
+
     print(f"Loaded {len(docs)} documents from knowledge base.")
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=500,
-        chunk_overlap=70,
+        chunk_overlap=100,
         length_function=len,
         separators=["\n\n", "\n", ". ", " "]
     )
@@ -32,10 +35,9 @@ def build_vector_store():
     chunks = text_splitter.split_documents(docs)
     print(f"Split {len(chunks)} chunks from {len(docs)} documents.")
 
-    model_name = "sentence-transformers/all-MiniLM-L6-v2"
-    print(f"Loading embedding model: {model_name}...")
-    embeddings = HuggingFaceEmbeddings(model_name=model_name)
-    print(f"Loaded embedding model: {model_name}.")
+    print("Loading ONNX embedding model (FastEmbed)...")
+    embeddings = FastEmbedEmbeddings()
+    print("Loaded FastEmbed embedding model.")
 
     vectorstore = FAISS.from_documents(chunks, embeddings)
     print("FAISS vector store built successfully.")
