@@ -13,6 +13,7 @@ engine = create_engine(
 
 class HabitTrackerModel(SQLModel, table = True):
     id:Optional[int] = Field(default=None, primary_key=True)
+    user_id: str = Field(index = True)
     name: str = Field(index = True)
     description: Optional[str] = None
     created_at: date = Field(default_factory = date.today)
@@ -31,3 +32,5 @@ def verify_and_update_streak(habit: HabitTrackerModel, session: Session) ->None:
         habit.streak = 0
         session.add(habit)
         session.commit()
+        session.refresh(habit)
+        
