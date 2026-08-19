@@ -4,6 +4,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from pydantic import BaseModel
 from agent import chatbot, clean_bot_output
 from models import init_db
+from output_guard import apply_output_guardrail
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,9 +16,10 @@ class ChatRequest(BaseModel):
     user_id: str
     thread_id: str
     message: str
+
 class ChatResponse(BaseModel):
     response: str
-    answer_type: str
+    answer_type: str = "direct"
     retrieved_context: list[str] = []
 
 @app.get("/health")
@@ -35,21 +37,15 @@ def chat_message(request: ChatRequest):
             "user_id": request.user_id,
         }
     }
-    user_input = {
-        "messages": [
-            HumanMessage(
-                content=f"[User ID: {request.user_id}]\n{request.message}"
-            )
-        ]
-    }
+    
+    formatted_input = f"<user_prompt>\n[User ID: {request.user_id}]\n{request.message}\n</user_prompt>"
+    user_input = {"messages": [HumanMessage(content=formatted_input)]}
     try:
         current_state = chatbot.get_state(config)
         history_len_before = len(current_state.values.get("messages", []))
     except Exception:
         history_len_before = 0
-
     result = chatbot.invoke(user_input, config)
-
     all_messages = result.get("messages", [])
     if not all_messages:
         raise HTTPException(status_code=500, detail="No response from chatbot")
@@ -73,6 +69,7 @@ def chat_message(request: ChatRequest):
 
     last_ai_msg = ai_messages[-1]
     raw_text = ""
+
     if isinstance(last_ai_msg.content, str):
         raw_text = last_ai_msg.content
     elif isinstance(last_ai_msg.content, list):
@@ -85,12 +82,13 @@ def chat_message(request: ChatRequest):
         raw_text = "\n".join(text_parts)
     elif isinstance(last_ai_msg.content, dict):
         raw_text = last_ai_msg.content.get("text", "")
-
     cleaned = clean_bot_output(raw_text)
     if not cleaned or not cleaned.strip():
         cleaned = raw_text.strip() or "No output generated."
+    guarded_response = apply_output_guardrail(cleaned)
+  
     return ChatResponse(
-        response=cleaned,
+        response=guarded_response,
         answer_type=answer_type,
         retrieved_context=retrieved_context,
     )
