@@ -1,11 +1,11 @@
 import os
 from langchain_core.tools import tool
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import FAISS
 
 INDEX_SAVE_PATH = "faiss_index"
 
-_embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+_embeddings = FastEmbedEmbeddings()
 
 if os.path.exists(INDEX_SAVE_PATH):
     _vector_store = FAISS.load_local(
@@ -15,7 +15,6 @@ if os.path.exists(INDEX_SAVE_PATH):
     )
 else:
     _vector_store = None
-
 
 @tool
 def search_health_knowledge_base(query: str) -> str:
@@ -33,6 +32,8 @@ def search_health_knowledge_base(query: str) -> str:
 
     formatted_results = []
     for i, doc in enumerate(docs, 1):
-        formatted_results.append(f"--- Passage {i} ---\n{doc.page_content}")
+        source_file = doc.metadata.get("source", "unknown")
+        formatted_results.append(f"--- Source: {source_file} ---\n--- Passage {i} ---\n{doc.page_content}")
 
-    return "\n\n".join(formatted_results)
+    raw_passages = "\n\n".join(formatted_results)
+    return f"<retrieved_data>\n{raw_passages}\n</retrieved_data>"
