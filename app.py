@@ -3,9 +3,7 @@ import requests
 import streamlit as st
 
 st.set_page_config(page_title="Habit Builder Bot", layout="centered")
-
 st.sidebar.title("User Profile & Session")
-
 if "user_id" not in st.session_state:
     st.session_state.user_id = "default_user"
 
@@ -17,7 +15,6 @@ user_id = st.sidebar.text_input(
 
 st.session_state.user_id = user_id.strip() if user_id.strip() else "default_user"
 st.sidebar.success(f"Active User ID: `{st.session_state.user_id}`")
-
 if "thread_id" not in st.session_state:
     st.session_state.thread_id = f"chat-{uuid.uuid4().hex[:6]}"
 
