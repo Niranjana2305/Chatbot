@@ -100,10 +100,18 @@ When you request changes to an active habit (e.g., changing its target frequency
 
 
 
+<img width="354" height="301" alt="image" src="https://github.com/user-attachments/assets/000a4f35-675e-4ea1-bb08-8e52fb3366d2" />
+
+
+
 ---
 
 ### 5. Deleting a Habit
 When you stop tracking a goal, asking to delete or remove it triggers the delete_habit tool, removing it from the database and returning confirmation feedback.
+
+
+
+<img width="396" height="296" alt="Screenshot 2026-08-25 082303" src="https://github.com/user-attachments/assets/38159b7a-96f3-4973-9c2c-658cc0ed2b31" />
 
 
 
