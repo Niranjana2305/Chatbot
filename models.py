@@ -1,8 +1,6 @@
-import os
 from datetime import date
 from typing import Optional
-from sqlmodel import Field, SQLModel, create_engine, Session
-
+from sqlmodel import Field, SQLModel, create_engine, Session, select
 
 DATABASE_URL = "sqlite:///habits.db"
 engine = create_engine(
@@ -33,4 +31,42 @@ def verify_and_update_streak(habit: HabitTrackerModel, session: Session) ->None:
         session.add(habit)
         session.commit()
         session.refresh(habit)
+
+def delete_habit_db(user_id: str, name: str) -> bool:
+    with Session(engine) as session:
+        statement = select(HabitTrackerModel).where(
+            HabitTrackerModel.user_id == user_id,
+            HabitTrackerModel.name.ilike(name),
+        )
+        habit = session.exec(statement).first()
+        if not habit:
+            return False
+        session.delete(habit)
+        session.commit()
+        return True
+
+
+def update_habit_db(
+    user_id: str,
+    name: str,
+    frequency_days: Optional[int] = None,
+    description: Optional[str] = None,) -> Optional[HabitTrackerModel]:
+
+    with Session(engine) as session:
+        statement = select(HabitTrackerModel).where(
+            HabitTrackerModel.user_id == user_id,
+            HabitTrackerModel.name.ilike(name),
+        )
+        habit = session.exec(statement).first()
+        if not habit:
+            return None
+        if frequency_days is not None:
+            habit.frequency_days = frequency_days
+        if description is not None:
+            habit.description = description
+
+        session.add(habit)
+        session.commit()
+        session.refresh(habit)
+        return habit
         
