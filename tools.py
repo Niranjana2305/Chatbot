@@ -1,6 +1,6 @@
 from typing import Optional
 from sqlmodel import Session, select, func
-from models import HabitTrackerModel, engine, verify_and_update_streak
+from models import HabitTrackerModel, engine, verify_and_update_streak, delete_habit_db, update_habit_db
 from langchain_core.tools import tool
 from datetime import date
 from rag import search_health_knowledge_base  
@@ -98,4 +98,57 @@ def log_checkin(user_id:str, name:str)->str:
         
         return f"Streak updated! You've now completed '{name}' for {habit.streak} consecutive days. Keep it going!"
 
-HABIT_TOOLS = [add_habit, list_habits, log_checkin, search_health_knowledge_base, save_user_profile, get_user_profile]
+@tool
+def delete_habit(user_id: str, name: str) -> str:
+    """Removes a habit from the tracker.
+
+    Use when the user wants to delete, remove, drop, or stop tracking a specific
+    habit.
+    """
+    if not user_id:
+        return "Error: User ID is required."
+
+    success = delete_habit_db(user_id=user_id, name=name)
+    if success:
+        return f"Successfully deleted habit '{name}' from your tracker."
+    return f"No habit found matching '{name}' for user '{user_id}'. No action taken."
+
+
+@tool
+def update_habit(
+    user_id: str,
+    name: str,
+    frequency_days: Optional[int] = None,
+    description: Optional[str] = None,
+) -> str:
+    """Updates the frequency_days or description of an existing habit.
+
+    Use when the user wants to modify, change, or adjust details of a habit they
+    are currently tracking.
+    """
+    if not user_id:
+        return "Error: User ID is required."
+
+    if frequency_days is None and description is None:
+        return "No updates specified. Please provide a new frequency or description."
+
+    updated = update_habit_db(
+        user_id=user_id,
+        name=name,
+        frequency_days=frequency_days,
+        description=description,
+    )
+    if not updated:
+        return (
+            f"No habit found matching '{name}' to update for user '{user_id}'."
+        )
+
+    changes = []
+    if frequency_days is not None:
+        changes.append(f"frequency to every {frequency_days} day(s)")
+    if description is not None:
+        changes.append(f"description to '{description}'")
+
+    return f"Successfully updated habit '{name}': {', '.join(changes)}."
+
+HABIT_TOOLS = [add_habit, list_habits, log_checkin, search_health_knowledge_base, save_user_profile, get_user_profile, delete_habit, update_habit]
