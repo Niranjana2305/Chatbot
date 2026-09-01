@@ -21,7 +21,7 @@ The Habit Builder Bot combines interactive habit tracking with persistent long-t
 - 👤 **Multi-User Identity Controls:** Streamlit sidebar allows switching between `user_id` profiles with active visual feedback badges.
 - 📝 **Interactive Habit Tracking:** Create, list, update (frequency, description, or name), and delete custom habits.
 - 🔥 **Automated Streak Maintenance:** Log check-ins and let the bot update and calculate streaks automatically in real time.
-- 📚 **Grounded Health Guidance (RAG):** Local vector search (`sentence-transformers/all-MiniLM-L6-v2` + FAISS) providing grounded exercise safety answers with mandatory medical disclaimers.
+- 📚 **Grounded Health Guidance (RAG):** Local vector search (`FastEmbedEmbeddings()` + FAISS) providing grounded exercise safety answers with mandatory medical disclaimers.
 - 🛡️ **OWASP LLM01 Prompt Injection Defenses:** System prompt operational boundaries, strict persona protection, and hard refusal protocols.
 - 📦 **Input & Retrieval Delimiters:** Encapsulates incoming messages inside `<user_prompt>` and RAG context inside `<retrieved_data>` tags to separate instructions from data.
 - 🔒 **Post-Agent Output Guardrails:** `output_guard.py` filters raw model responses before sending them back to the API client to prevent prompt leakage.
@@ -164,7 +164,7 @@ When starting a brand-new conversation thread, the assistant invokes get_user_pr
 | **Agent Framework** | LangChain / LangGraph |
 | **Long-Term Memory** | LangGraph `SqliteStore` (Cross-Session) |
 | **Short-Term Memory** | LangGraph `SqliteSaver` (Thread Checkpointer) |
-| **Embeddings Model** | HuggingFace (`sentence-transformers/all-MiniLM-L6-v2`) |
+| **Embeddings Model** | HuggingFace (`FastEmbedEmbeddings()`) |
 | **Vector Store** | FAISS |
 | **Database & ORM** | SQLite + SQLModel |
 | **LLM Vulnerability Scanner** | Garak (`garak_harness.py`) |
@@ -176,7 +176,7 @@ When starting a brand-new conversation thread, the assistant invokes get_user_pr
 
 ### Prerequisites
 
-* Python 3.10+
+* Python 3.14+
 * [`uv`](https://docs.astral.sh/uv/) installed on your machine
 
 ### 1. Clone the Repository & Setup Environment
@@ -197,7 +197,7 @@ Create a `.env` file in the root directory:
 ```env
 MODEL_NAME=groq:llama-3.3-70b-versatile
 # OR for Google Gemini:
-# MODEL_NAME=gemini:gemini-1.5-flash
+# MODEL_NAME=google_genai:gemini-1.5-flash
 # GOOGLE_API_KEY=your_google_api_key_here
 
 ```
@@ -255,9 +255,9 @@ uv run streamlit run app.py
 
 ```text
 ├── knowledge_base/         # Markdown files with exercise safety & health guidelines
-│   ├── 01_emergency_red_flags.md
-│   ├── 02_exercise_safety_progression.md
-│   ├── 03_overtraining_recovery.md
+│   ├── 01_emergency_red_flags.txt
+│   ├── 02_exercise_safety_progression.txt
+│   ├── 03_overtraining_recovery.txt
 │   └── ...
 ├── build_kb.py             # Generates FAISS vector index from knowledge base files
 ├── eval_rag.py             # Evaluates vector retrieval accuracy (Hit Rate@k)
